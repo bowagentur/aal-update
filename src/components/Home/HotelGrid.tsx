@@ -1,7 +1,32 @@
-import { Star, MapPin } from 'lucide-react';
-import { hotels } from '../../data/hotels';
+import { Star, MapPin, Loader2, AlertCircle } from 'lucide-react';
+import { useHotels } from '../../hooks/useHotels';
 
 export function HotelGrid() {
+  const { hotels, loading, error } = useHotels();
+
+  if (loading) {
+    return (
+      <div className="py-24 bg-gray-50">
+        <div className="custom-container flex justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="py-24 bg-gray-50">
+        <div className="custom-container">
+          <div className="bg-red-50 p-4 rounded-lg flex items-center gap-3 text-red-700">
+            <AlertCircle className="w-6 h-6" />
+            <p>{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <section className="py-24 bg-gray-50" id="hotels">
       <div className="custom-container">
@@ -18,7 +43,7 @@ export function HotelGrid() {
             <article key={hotel.id} className="group bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
               <div className="relative h-64">
                 <img 
-                  src={hotel.sections.welcome.images[0].url} 
+                  src={hotel.sections?.welcome?.images?.[0]?.url || '/platzhalter.png'} 
                   alt={hotel.name} 
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
@@ -28,7 +53,7 @@ export function HotelGrid() {
               <div className="p-6">
                 <div className="flex items-center gap-2 text-secondary mb-2">
                   <MapPin className="w-4 h-4" />
-                  <span className="text-sm">{hotel.location.city}</span>
+                  <span className="text-sm">{hotel.location?.city}</span>
                 </div>
 
                 <div className="flex items-center justify-between mb-3">
@@ -49,7 +74,7 @@ export function HotelGrid() {
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between">
                     <a 
-                      href={`/hotels/${hotel.id}`} 
+                      href={`/hotels/${hotel.id}`}
                       className="inline-flex items-center gap-1 text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] font-medium text-sm group-hover:underline"
                     >
                       Details ansehen

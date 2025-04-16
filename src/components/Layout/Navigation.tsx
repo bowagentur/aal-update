@@ -1,12 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, ChevronDown, Home, Info, Briefcase, Mail, Building2 } from 'lucide-react';
-import { useTheme } from '../../context/ThemeContext';
-import { hotels } from '../../data/hotels';
+import { useHotels } from '../../hooks/useHotels';
 
 export function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isHotelsMenuOpen, setIsHotelsMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const { hotels } = useHotels();
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const menuItems = [
     { path: '/', label: 'Startseite', icon: Home },
@@ -15,15 +22,15 @@ export function Navigation() {
     { path: '/contact', label: 'Kontakt', icon: Mail }
   ];
 
-  const renderMenuItem = (item: { path: string; label: string; icon: any }, isMobile = false) => (
+  const renderMenuItem = (item: { path: string; label: string; icon: any }, mobile = false) => (
     <li className="flex items-center">
       <Link 
         to={item.path} 
         className={`
           nav-link hover:text-[#c4984d] transition-colors duration-200 flex items-center gap-2
-          ${isMobile ? 'block text-lg py-2 px-4 w-full hover:bg-gray-50 rounded-md' : ''}
+          ${mobile ? 'block text-lg py-2 px-4 w-full hover:bg-gray-50 rounded-md' : ''}
         `}
-        onClick={() => isMobile && setIsMobileMenuOpen(false)}
+        onClick={() => mobile && setIsMobileMenuOpen(false)}
       >
         {item.icon && <item.icon className="h-5 w-5" />}
         {item.label}
@@ -31,35 +38,38 @@ export function Navigation() {
     </li>
   );
 
-  const renderHotelDropdown = (isMobile = false) => (
-    <div className={isMobile ? 'pl-4 space-y-4 pb-3' : 'grid grid-cols-2 gap-6'}>
-      <div className={isMobile ? '' : 'px-6'}>
-        {!isMobile && <h3 className="font-semibold text-lg mb-4 text-gray-800">Unsere Hotels</h3>}
-        <div className={isMobile ? '' : 'space-y-6'}>
-          <Link 
-            to="/hotels/rheinpark-rees" 
-            className={`
-              flex items-start hover:bg-gray-50 rounded-md transition-colors duration-200
-              ${isMobile ? 'space-x-3 p-2' : 'space-x-4 p-3'}
-            `}
-            onClick={() => isMobile && setIsMobileMenuOpen(false)}
-          >
-            <img 
-              src={hotels[0]?.branding?.logo ?? '/logos/default_logo.png'} 
-              alt="Hotel Rheinpark Rees" 
-              className={`object-contain rounded-md ${isMobile ? 'w-20 h-14' : 'w-24 h-16'}`}
-            />
-            <div>
-              <h4 className="font-medium text-[#c4984d] group-hover/item:text-[#ab813d] transition-colors duration-200">
-                Hotel Rheinpark Rees
-              </h4>
-              <p className="text-sm text-gray-600">Rees am Rhein</p>
-            </div>
-          </Link>
+  const renderHotelDropdown = (mobile = false) => (
+    <div className={mobile ? 'pl-4 space-y-4 pb-3' : 'grid grid-cols-2 gap-6'}>
+      <div className={mobile ? '' : 'px-6'}>
+        {!mobile && <h3 className="font-semibold text-lg mb-4 text-gray-800">Unsere Hotels</h3>}
+        <div className={mobile ? '' : 'space-y-6'}>
+          {hotels.map(hotel => (
+            <Link 
+              key={hotel.id}
+              to={`/hotels/${hotel.id}`}
+              className={`
+                flex items-start hover:bg-gray-50 rounded-md transition-colors duration-200
+                ${mobile ? 'space-x-3 p-2' : 'space-x-4 p-3'}
+              `}
+              onClick={() => mobile && setIsMobileMenuOpen(false)}
+            >
+              <img 
+                src={hotel.branding?.logo ?? '/logos/default_logo.png'} 
+                alt={hotel.name} 
+                className={`object-contain rounded-md ${mobile ? 'w-20 h-14' : 'w-24 h-16'}`}
+              />
+              <div>
+                <h4 className="font-medium text-[#c4984d] group-hover/item:text-[#ab813d] transition-colors duration-200">
+                  {hotel.name}
+                </h4>
+                <p className="text-sm text-gray-600">{hotel.location?.city}</p>
+              </div>
+            </Link>
+          ))}
         </div>
       </div>
 
-      {!isMobile && (
+      {!mobile && (
         <div className="px-6">
           <h3 className="font-semibold text-lg mb-4 text-gray-800">Aktuelle Angebote</h3>
           <div className="bg-gradient-to-br from-[#f5e6cc] to-[#f9f2e6] p-4 rounded-lg">
@@ -105,13 +115,9 @@ export function Navigation() {
       </button>
 
       <div className="custom-container relative bg-white">
-        {/* Removed Mobile Menu Button from here */}
-        
         {/* Desktop Menu */}
-        <ul className="hidden md:flex flex-wrap justify-center text-center space-x-8 py-4 text-lg font-medium">
-          {menuItems.map((item, index) => (
-            index === 0 && renderMenuItem(item)
-          ))}
+        <ul className="hidden md:flex flex-wrap items-center justify-center space-x-8 py-4 text-lg font-medium">
+          <li>{renderMenuItem(menuItems[0])}</li>
           <li className="relative flex items-center group">
             <button 
               className="flex items-center nav-link hover:text-[var(--color-secondary)] transition-colors duration-200 py-2"
@@ -120,12 +126,12 @@ export function Navigation() {
               Hotels
               <ChevronDown className="ml-1 h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
             </button>
-            <div className="absolute hidden group-hover:block top-full left-1/2 -translate-x-1/2 w-[800px] bg-white shadow-lg rounded-md py-4 mt-1">
+            <div className="absolute hidden group-hover:block top-full left-1/2 -translate-x-1/2 w-[800px] bg-white shadow-lg rounded-md py-4 mt-1 z-50">
               {renderHotelDropdown()}
             </div>
           </li>
-          {menuItems.map((item, index) => (
-            index > 0 && renderMenuItem(item)
+          {menuItems.slice(1).map(item => (
+            <li key={item.path}>{renderMenuItem(item)}</li>
           ))}
         </ul>
 
@@ -186,26 +192,29 @@ export function Navigation() {
 
               {/* Fixed Contact Box at Bottom - Modified to be more compact */}
               <div className="border-t border-gray-100 bg-white/80 backdrop-blur-sm p-4 sticky bottom-0 z-10">
-                <div className="bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl p-4 space-y-3 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)]">
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1 font-medium">Reservierung & Anfragen</p>
-                    <a 
-                      href="tel:+4928519370" 
-                      className="text-base font-medium text-[#c4984d] hover:text-[#ab813d] active:text-[#8e6a32] transition-colors duration-200 flex items-center gap-2 group"
-                    >
-                      <div className="p-1.5 bg-[#c4984d]/10 rounded-lg group-hover:bg-[#c4984d]/20 transition-colors duration-200">
-                        <Mail className="h-4 w-4" />
-                      </div>
-                      +49 (0) 2851 93 70
-                    </a>
-                  </div>
-                  <a 
-                    href="/buchen" 
-                    className="block w-full bg-[#c4984d] hover:bg-[#ab813d] active:bg-[#8e6a32] text-white font-medium py-2.5 px-4 rounded-lg text-center text-sm transition-all duration-200 shadow-lg hover:shadow-[0_10px_20px_-5px_rgba(196,152,77,0.3)] hover:-translate-y-0.5 active:translate-y-0 active:shadow-md"
+                {hotels.map(hotel => (
+                  <Link 
+                    key={hotel.id}
+                    to={`/hotels/${hotel.id}`}
+                    className={`
+                      flex items-start hover:bg-gray-50 rounded-md transition-colors duration-200
+                      ${isMobile ? 'space-x-3 p-2' : 'space-x-4 p-3'}
+                    `}
+                    onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    Jetzt buchen
-                  </a>
-                </div>
+                    <img 
+                      src={hotel.branding?.logo ?? '/logos/default_logo.png'} 
+                      alt={hotel.name} 
+                      className={`object-contain rounded-md ${isMobile ? 'w-20 h-14' : 'w-24 h-16'}`}
+                    />
+                    <div>
+                      <h4 className="font-medium text-[#c4984d] group-hover/item:text-[#ab813d] transition-colors duration-200">
+                        {hotel.name}
+                      </h4>
+                      <p className="text-sm text-gray-600">{hotel.location?.city}</p>
+                    </div>
+                  </Link>
+                ))}
               </div>
             </div>
           </div>

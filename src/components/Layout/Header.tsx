@@ -1,28 +1,21 @@
 import { Link, useLocation } from 'react-router-dom';
-import { hotels, defaultHotel } from '../../data/hotels';
+import { useHotels } from '../../hooks/useHotels';
 import { useState, useEffect } from 'react';
+import { defaultHotel } from '../../data/hotels';
 
 export function Header() {
   const location = useLocation();
+  const { hotels } = useHotels();
   
   const currentHotel = hotels.find(hotel => {
     // Prüfe ob die URL den Hotel-ID enthält
     return location.pathname.includes(`/hotels/${hotel.id}`);
   });
   
-  // Debug-Log um zu sehen, was gefunden wird
-  console.log('Current hotel:', currentHotel);
-  console.log('Current hotel social:', currentHotel?.contact?.social);
-  
   // Hole die Branding-Farben vom aktuellen Hotel oder nutze die Standard-Farben
-  const primaryColor = currentHotel?.branding?.primaryColor || defaultHotel.branding.primaryColor;
-  const secondaryColor = currentHotel?.branding?.secondaryColor || defaultHotel.branding.secondaryColor;
-  const displayLogo = currentHotel?.branding?.logo || defaultHotel.branding.logo;
-
-  // Debug-Log
-  console.log('Current path:', location.pathname);
-  console.log('Found hotel:', currentHotel?.id);
-  console.log('Using logo:', currentHotel?.branding?.logo || defaultHotel.branding.logo);
+  const primaryColor = currentHotel?.branding?.primaryColor || '#0069b3';
+  const secondaryColor = currentHotel?.branding?.secondaryColor || '#c4984d';
+  const displayLogo = currentHotel?.branding?.logo || '/logos/default_logo.png';
 
   // Neue State für aktuelle Sprache
   const [currentLanguage, setCurrentLanguage] = useState('de');
