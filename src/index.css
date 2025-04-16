@@ -1,0 +1,176 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply font-sans text-gray-800;
+  }
+
+  :root {
+    --color-primary: #0069b3;
+    --color-primary-dark: #005290;
+    --color-secondary: #c4984d;
+  }
+}
+
+@layer components {
+  .custom-container {
+    @apply container mx-auto px-4 max-w-7xl;
+  }
+
+  .btn-primary {
+    @apply bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white 
+           px-6 py-3 rounded-lg transition-colors;
+  }
+
+  .btn-primary-sm {
+    @apply inline-flex items-center px-4 py-2 bg-primary text-white rounded-lg 
+           hover:bg-primary-dark transition-colors duration-300 font-medium text-sm;
+  }
+
+  .btn-secondary {
+    @apply border-2 border-[var(--color-secondary)] text-[var(--color-secondary)] 
+           hover:bg-[var(--color-secondary)] hover:text-white 
+           px-6 py-3 rounded-lg transition-colors;
+  }
+
+  .btn-secondary-sm {
+    @apply inline-flex items-center px-4 py-2 bg-secondary text-white rounded-lg 
+           hover:bg-secondary-dark transition-colors duration-300 font-medium text-sm;
+  }
+
+  .nav-link {
+    @apply text-gray-700 hover:text-primary transition-colors duration-200;
+  }
+
+  .link-primary {
+    @apply text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] 
+           transition-colors;
+  }
+
+  .bg-primary {
+    @apply bg-[var(--color-primary)];
+  }
+
+  .bg-primary-light {
+    @apply bg-[var(--color-primary)]/5;
+  }
+
+  .text-primary {
+    @apply text-[var(--color-primary)];
+  }
+
+  .border-primary {
+    @apply border-[var(--color-primary)];
+  }
+
+  .hover\:bg-primary-dark:hover {
+    @apply hover:bg-[var(--color-primary-dark)];
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 1s ease-out;
+}
+
+.custom-container {
+  width: 88%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 768px) {
+  .custom-container {
+    width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Default styles (used on homepage and other pages) */
+.text-primary {
+  color: #0069b3;
+}
+
+.bg-primary {
+  background-color: #0069b3;
+}
+
+.hover\:bg-primary:hover {
+  background-color: #0069b3;
+}
+
+.hover\:text-primary:hover {
+  color: #0069b3;
+}
+
+/* Hotel-specific styles (using CSS variables) */
+.hotel-page .text-primary {
+  color: var(--color-primary);
+}
+
+.hotel-page .bg-primary {
+  background-color: var(--color-primary);
+}
+
+.hotel-page .hover\:bg-primary:hover {
+  background-color: var(--color-primary);
+}
+
+.hotel-page .hover\:text-primary:hover {
+  color: var(--color-primary);
+}
+
+.animate-fadeIn {
+  animation: fadeIn 1s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slideUp {
+  animation: slideUp 0.8s ease-out forwards;
+}
+
+.animation-delay-100 {
+  animation-delay: 100ms;
+}
+
+.animation-delay-200 {
+  animation-delay: 200ms;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #c4984d;
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.nav-link:hover::after {
+  transform: scaleX(1);
+}
